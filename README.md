@@ -22,7 +22,7 @@
    ```
    docker build -t adapter:latest --build-arg GITHUB_USER="$GITHUB_USER" --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" .
    ```
-1. Run the Docker image.
+1. Run the adapter server as a Docker container.
    ```
    docker run --rm -it adapter:latest
    ```
