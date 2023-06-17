@@ -49,7 +49,7 @@ func (a *Adapter) RequestPageFromDatasource(ctx context.Context, request *framew
 
 	a.Logger.Printf("Querying example datasource at URL %s", exampleRequest.URL)
 
-	exampleResponse, err := a.Client.GetPage(ctx, exampleRequest)
+	exampleResponse, err := a.ExampleClient.GetPage(ctx, exampleRequest)
 
 	if err != nil {
 		a.Logger.Printf("Example datasource query failed: %v", err)

@@ -31,8 +31,8 @@ type Adapter struct {
 	// Logger is a standard logger.
 	Logger *log.Logger
 
-	// Client provides access to the example datasource.
-	Client example_datasource.Client
+	// ExampleClient provides access to the example datasource.
+	ExampleClient example_datasource.Client
 }
 
 // NewAdapter instantiates a new Adapter.
@@ -41,8 +41,8 @@ type Adapter struct {
 // Add/remove parameters as needed to configure this adapter.
 func NewAdapter(logger *log.Logger, client example_datasource.Client) framework.Adapter[Config] {
 	return &Adapter{
-		Logger: logger,
-		Client: client,
+		Logger:        logger,
+		ExampleClient: client,
 	}
 }
 
