@@ -13,6 +13,10 @@
 
 1. Modify the adapter implementation in package `pkg/adapter` to query your datasource. All the code that must be modified is identified with `SCAFFOLDING` comments.
 1. Delete the example datasource implementation in package `pkg/example_datasource`.
+1. **WARNING: Temporary workaround to download the adapter-framework module before it is made public.**
+   ```
+   export GOPRIVATE=github.com/sgnl-ai
+   ```
 1. Build the adapter command binary.
    ```
    go build ./cmd/adapter/
