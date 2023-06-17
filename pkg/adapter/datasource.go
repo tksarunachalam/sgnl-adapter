@@ -40,7 +40,7 @@ func (a *Adapter) RequestPageFromDatasource(ctx context.Context, request *framew
 	// example datasource that returns JSON objects.
 
 	exampleRequest := &example_datasource.Request{
-		URL:      fmt.Sprintf("%s/%s/%s/", request.Address, request.Config.DatasourceVersion, request.Entity.ExternalId),
+		URL:      fmt.Sprintf("%s/%s/%s", request.Address, request.Config.DatasourceVersion, request.Entity.ExternalId),
 		Username: request.Auth.Basic.Username,
 		Password: request.Auth.Basic.Password,
 		PageSize: request.PageSize,

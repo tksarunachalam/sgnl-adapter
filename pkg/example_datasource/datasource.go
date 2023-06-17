@@ -35,7 +35,7 @@ func NewClient() Client {
 func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, error) {
 	// Parse the entity's external ID from the URL.
 	index := strings.LastIndex(request.URL, "/")
-	entityExternalId := request.URL[index:]
+	entityExternalId := request.URL[index+1:]
 
 	entityData, found := Data[entityExternalId]
 	if !found {
@@ -45,11 +45,16 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	}
 
 	// The cursor is the index of the next object to return.
-	startIndex, err := strconv.Atoi(request.Cursor)
-	if err != nil {
-		return &Response{
-			StatusCode: http.StatusBadRequest,
-		}, nil
+	var startIndex int
+	var err error
+
+	if request.Cursor != "" {
+		startIndex, err = strconv.Atoi(request.Cursor)
+		if err != nil {
+			return &Response{
+				StatusCode: http.StatusBadRequest,
+			}, nil
+		}
 	}
 
 	response := &Response{

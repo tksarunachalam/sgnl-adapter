@@ -55,6 +55,5 @@ func (a *Adapter) GetPage(ctx context.Context, request *framework.Request[Config
 		return framework.NewGetPageResponseError(err)
 	}
 
-	// TODO
-	return framework.NewGetPageResponseError(nil)
+	return a.RequestPageFromDatasource(ctx, request)
 }
