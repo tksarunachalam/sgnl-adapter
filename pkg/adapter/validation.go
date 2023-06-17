@@ -38,7 +38,7 @@ const (
 	//
 	// SCAFFOLDING:
 	// Update this limit to match the limit of the datasource.
-	MaxPageSize = 200
+	MaxPageSize = 100
 
 	// UniqueIdAttribute is the name of the attribute containing the unique ID of
 	// each returned object for the requested entity.
