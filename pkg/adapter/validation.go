@@ -57,8 +57,8 @@ var (
 	// Update this set to match the set of entities that can be queried from
 	// the datasource.
 	ValidEntityExternalIds = map[string]struct{}{
-		"User":  struct{}{},
-		"Group": struct{}{},
+		"User":  {},
+		"Group": {},
 	}
 )
 
@@ -139,7 +139,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 
 	if request.PageSize > MaxPageSize {
 		return &framework.Error{
-			Message: fmt.Sprintf("ErrMsgInvalidPageSizeFmt", request.PageSize, MaxPageSize),
+			Message: fmt.Sprintf(ErrMsgInvalidPageSizeFmt, request.PageSize, MaxPageSize),
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_PAGE_REQUEST_CONFIG,
 		}
 	}
