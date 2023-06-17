@@ -2,10 +2,10 @@ github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaS
 github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg=
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/sgnl-ai/adapter-framework v0.0.0-20230616231656-66cbafd321d0 h1:5GKiCRVP0pt05DrBQLIWsxqLehHXwHZQPIae2tp+Y2U=
-github.com/sgnl-ai/adapter-framework v0.0.0-20230616231656-66cbafd321d0/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
-github.com/sgnl-ai/adapter-framework v0.0.0-20230617004441-26b180d85231 h1:/e0fKT1uyO1OThow0s2Qu01LPlNnyJRLK0Q57zmHiQg=
-github.com/sgnl-ai/adapter-framework v0.0.0-20230617004441-26b180d85231/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617012641-bae477dd45ef h1:yFkff2rBMTn0GYvM9V6g6r+VB+FarhPCfQSS4Hv/YQ8=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617012641-bae477dd45ef/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617013930-be6c7194fb55 h1:Ydl/fl5g3a0UFxCUHbfiFYeTIFx/ZzRAfqWWM83aEdQ=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617013930-be6c7194fb55/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
 golang.org/x/net v0.9.0 h1:aWJ/m6xSmxWBx+V0XRHTlrYrPG56jKsLdTFmsSsCzOM=
 golang.org/x/net v0.9.0/go.mod h1:d48xBJpPfHeWQsugry2m+kC02ZBRGRgulfHnEXEuWns=
 golang.org/x/net v0.11.0 h1:Gi2tvZIJyBtO9SDr1q9h5hEQCp/4L2RQ+ar0qjx2oNU=
