@@ -38,6 +38,16 @@ RUN CGO_ENABLED=0 go install -ldflags "-s -w" github.com/google/gops@${GOPS_VERS
 WORKDIR /build
 COPY . ./
 
+# TODO: BEGIN
+# Remove this hack to allow accessing the SGNL-ai/* private repositories.
+# DO NOT PUBLISH images built with this Dockerfile as the image's
+# history will include those credentials.
+ARG GITHUB_USER=$GITHUB_USER
+ARG GITHUB_TOKEN=$GITHUB_TOKEN
+RUN echo "machine github.com\n\tlogin $GITHUB_USER\n\tpassword $GITHUB_TOKEN" >> ~/.netrc \
+    && GOPRIVATE=github.com/sgnl-ai go mod download
+# TODO: END
+
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" ./cmd/adapter
 
 FROM ${BASE_IMAGE} AS run
