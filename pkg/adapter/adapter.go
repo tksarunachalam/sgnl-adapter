@@ -19,25 +19,30 @@ import (
 	"log"
 
 	framework "github.com/sgnl-ai/adapter-framework"
+	"github.com/sgnl-ai/adapter-template/pkg/example_datasource"
 )
 
 // Adapter implements the framework.Adapter interface to query pages of objects
 // from datasources.
 type Adapter struct {
 	// SCAFFOLDING:
-	// Add/remove fields as needed to configure this adapter.
+	// Add/remove fields below as needed to configure this adapter.
 
-	// Example field.
+	// Logger is a standard logger.
 	Logger *log.Logger
+
+	// Client provides access to the example datasource.
+	Client example_datasource.Client
 }
 
 // NewAdapter instantiates a new Adapter.
 //
 // SCAFFOLDING:
 // Add/remove parameters as needed to configure this adapter.
-func NewAdapter(logger *log.Logger) framework.Adapter[Config] {
+func NewAdapter(logger *log.Logger, client example_datasource.Client) framework.Adapter[Config] {
 	return &Adapter{
 		Logger: logger,
+		Client: client,
 	}
 }
 

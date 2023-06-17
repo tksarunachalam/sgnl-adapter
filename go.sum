@@ -5,6 +5,10 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/sgnl-ai/adapter-framework v0.0.0-20230617013930-be6c7194fb55 h1:Ydl/fl5g3a0UFxCUHbfiFYeTIFx/ZzRAfqWWM83aEdQ=
 github.com/sgnl-ai/adapter-framework v0.0.0-20230617013930-be6c7194fb55/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617054048-b03448ab5922 h1:le8gU7CgNUC43u7OLsqRTjatMtkEjzdGqIrbydrDdFc=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617054048-b03448ab5922/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617054603-cbfbaeada470 h1:hpqofTSL7uL8zP2vFHtD+qaBzqqNn5TvRz4JT2hfDd0=
+github.com/sgnl-ai/adapter-framework v0.0.0-20230617054603-cbfbaeada470/go.mod h1:U39ERHatAAwY3R2YgOGQ8C6Gx1IzfIU+t/t29i61xow=
 golang.org/x/net v0.11.0 h1:Gi2tvZIJyBtO9SDr1q9h5hEQCp/4L2RQ+ar0qjx2oNU=
 golang.org/x/net v0.11.0/go.mod h1:2L/ixqYpgIVXmeoSA/4Lu7BzTG4KIyPIryS4IsOd1oQ=
 golang.org/x/sys v0.9.0 h1:KS/R3tvhPqvJvwcKfnBHJwwthS11LRhmM5D59eEXa0s=
