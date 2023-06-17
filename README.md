@@ -13,15 +13,16 @@
 
 1. Modify the adapter implementation in package `pkg/adapter` to query your datasource. All the code that must be modified is identified with `SCAFFOLDING` comments.
 1. Delete the example datasource implementation in package `pkg/example_datasource`.
-1. **WARNING: Temporary workaround to download the adapter-framework module before it is made public.**
+1. Build the Docker image with the `adapter` command.
    ```
-   export GOPRIVATE=github.com/sgnl-ai
+   docker build -t adapter:latest .
    ```
-1. Build the adapter command binary.
+1. **WARNING: Temporary workaround to allow `go` to download the adapter-framework module before it is made public.**
+   **The image's history will contain your environment variables, incl. any GitHub credentials that it may contain.**
    ```
-   go build ./cmd/adapter/
+   docker build -t adapter:latest --build-arg GITHUB_USER="$GITHUB_USER" --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" .
    ```
-1. Execute the adapter command.
+1. Run the Docker image.
    ```
-   ./adapter
+   docker run --rm -it adapter:latest
    ```
