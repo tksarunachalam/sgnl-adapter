@@ -21,3 +21,7 @@
    ```
    go build ./cmd/adapter/
    ```
+1. Execute the adapter command.
+   ```
+   ./adapter
+   ```
