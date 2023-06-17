@@ -24,9 +24,12 @@ import (
 	"github.com/sgnl-ai/adapter-template/pkg/example_datasource"
 )
 
+// SCAFFOLDING:
+// Update the set of error messages.
 const (
-	ErrMsgExampleDatasourceErrorFmt      = "Example datasource returned an error: %v"
-	ErrMsgExampleDatasourceStatusCodeFmt = "Example datasource returned unexpected status code: %d"
+	ErrMsgExampleDatasourceErrorFmt                = "Example datasource returned an error: %v"
+	ErrMsgExampleDatasourceStatusCodeFmt           = "Example datasource returned unexpected status code: %d"
+	ErrMsgExampleDatasourceInvalidAttributeTypeFmt = "Example datasource returned an attribute with an incompatible type: %s"
 )
 
 // RequestPageFromDatasource requests a page of objects from a datasource.
@@ -70,7 +73,17 @@ func (a *Adapter) RequestPageFromDatasource(ctx context.Context, request *framew
 		NextCursor: exampleResponse.NextCursor,
 	}
 
-	// TODO: Parse the JSON objects.
+	page.Objects, err = web.ConvertJSONObjectList(&request.Entity, exampleResponse.Objects)
+	if err != nil {
+		a.Logger.Printf("Failed to parse JSON objects returned by the datasource: %v", err)
+
+		return framework.NewGetPageResponseError(
+			&framework.Error{
+				Message: fmt.Sprintf(ErrMsgExampleDatasourceInvalidAttributeTypeFmt, err.Error()),
+				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ATTRIBUTE_TYPE,
+			},
+		)
+	}
 
 	return framework.NewGetPageResponseSuccess(page)
 }

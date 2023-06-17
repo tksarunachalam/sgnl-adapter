@@ -3,7 +3,7 @@ module github.com/sgnl-ai/adapter-template
 go 1.18
 
 require (
-	github.com/sgnl-ai/adapter-framework v0.0.0-20230617054603-cbfbaeada470
+	github.com/sgnl-ai/adapter-framework v0.0.0-20230617070945-83e861e22d6c
 	google.golang.org/grpc v1.56.0
 )
 
