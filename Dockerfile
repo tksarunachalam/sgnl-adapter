@@ -15,7 +15,6 @@
 ARG GOLANG_IMAGE=golang:1.18-bullseye
 ARG BASE_IMAGE=gcr.io/distroless/static
 
-
 FROM ${GOLANG_IMAGE} as build
 
 RUN apt-get update && apt-get install -y \
@@ -39,7 +38,7 @@ RUN CGO_ENABLED=0 go install -ldflags "-s -w" github.com/google/gops@${GOPS_VERS
 WORKDIR /build
 COPY . ./
 
-RUN go build -ldflags "-s -w" ./cmd/adapter
+RUN CGO_ENABLED=0 go build -ldflags "-s -w" ./cmd/adapter
 
 FROM ${BASE_IMAGE} AS run
 USER nonroot:nonroot
