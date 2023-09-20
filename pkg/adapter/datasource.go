@@ -79,7 +79,7 @@ type Datasource struct {
 func NewClient(timeout int) Client {
 	return &Datasource{
 		Client: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: time.Duration(timeout) * time.Second,
 		},
 	}
 }
