@@ -23,7 +23,6 @@ import (
 	api_adapter_v1 "github.com/sgnl-ai/adapter-framework/api/adapter/v1"
 	"github.com/sgnl-ai/adapter-framework/server"
 	"github.com/sgnl-ai/adapter-template/pkg/adapter"
-	"github.com/sgnl-ai/adapter-template/pkg/example_datasource"
 	"google.golang.org/grpc"
 )
 
@@ -47,9 +46,7 @@ func main() {
 	// Pass options to configure TLS, etc.
 	s := grpc.NewServer()
 
-	// SCAFFOLDING:
-	// This directly connects the adapter to an in-memory example datasource.
-	adapter := adapter.NewAdapter(logger, example_datasource.NewClient())
+	adapter := adapter.NewAdapter(logger, adapter.NewClient(10))
 
 	api_adapter_v1.RegisterAdapterServer(s, server.New(adapter))
 

@@ -36,7 +36,7 @@ type Config struct {
 }
 
 // ValidateConfig validates that a Config received in a GetPage call is valid.
-func (c *Config) Validate(ctx context.Context) error {
+func (c *Config) Validate(_ context.Context) error {
 	// SCAFFOLDING:
 	// Update the checks below to validate the fields in Config.
 

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package example_datasource
+package adapter
 
 import (
 	"context"
+
+	framework "github.com/sgnl-ai/adapter-framework"
 )
 
 // Client is a client that allows querying the example datasource which
@@ -25,13 +27,16 @@ type Client interface {
 	// requested entity.
 	// Returns a (possibly empty) list of JSON objects, each object being
 	// unmarshaled into a map by Golang's JSON unmarshaler.
-	GetPage(ctx context.Context, request *Request) (*Response, error)
+	GetPage(ctx context.Context, request *Request) (*Response, *framework.Error)
 }
+
+// SCAFFOLDING:
+// Add/remove fields as needed.
 
 // Request is a request to the example datasource.
 type Request struct {
-	// URL is the URL of the datasource and entity to query.
-	URL string
+	// BaseURL is the Base URL of the datasource to query.
+	BaseURL string
 
 	// Username is the username to use to authenticate with the example
 	// datasource.
@@ -43,6 +48,10 @@ type Request struct {
 
 	// PageSize is the maximum number of objects to return from the entity.
 	PageSize int64
+
+	// EntityExternalID is the external ID of the entity.
+	// The external ID should match the API's resource name.
+	EntityExternalID string
 
 	// Cursor identifies the first object of the page to return, as returned by
 	// the last request for the entity.

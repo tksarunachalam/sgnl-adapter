@@ -16,12 +16,49 @@ package adapter
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"time"
 
 	framework "github.com/sgnl-ai/adapter-framework"
 	api_adapter_v1 "github.com/sgnl-ai/adapter-framework/api/adapter/v1"
-	"github.com/sgnl-ai/adapter-framework/web"
-	"github.com/sgnl-ai/adapter-template/pkg/example_datasource"
+)
+
+const (
+	// SCAFFOLDING:
+	// Update the set of valid entity types supported by this adapter.
+
+	Users  string = "users"
+	Groups string = "groups"
+)
+
+// Entity contains entity specific information, such as the entity's unique ID attribute and the
+// endpoint to query that entity.
+type Entity struct {
+	// SCAFFOLDING:
+	// Add or remove fields as needed. This should be used to store entity specific information
+	// such as the entity's unique ID attribute name and the endpoint to query that entity.
+
+	// uniqueIDAttrExternalID is the external ID of the entity's uniqueId attribute.
+	uniqueIDAttrExternalID string
+}
+
+var (
+	// SCAFFOLDING:
+	// Using the consts defined above, update the set of valid entity types supported by this adapter.
+
+	// ValidEntityExternalIDs is a map of valid external IDs of entities that can be queried.
+	// The map value is the Entity struct which contains the unique ID attribute.
+	ValidEntityExternalIDs = map[string]Entity{
+		Users: {
+			uniqueIDAttrExternalID: "user_id",
+		},
+		Groups: {
+			uniqueIDAttrExternalID: "group_id",
+		},
+	}
 )
 
 // SCAFFOLDING:
@@ -32,58 +69,124 @@ const (
 	ErrMsgExampleDatasourceInvalidAttributeTypeFmt = "Example datasource returned an attribute with an incompatible type: %s"
 )
 
-// RequestPageFromDatasource requests a page of objects from a datasource.
-func (a *Adapter) RequestPageFromDatasource(ctx context.Context, request *framework.Request[Config]) framework.Response {
+// Datasource directly implements a Client interface to allow querying
+// an external datasource.
+type Datasource struct {
+	Client *http.Client
+}
+
+// NewClient returns a Client to query the example datasource.
+func NewClient(timeout int) Client {
+	return &Datasource{
+		Client: &http.Client{
+			Timeout: 10 * time.Second,
+		},
+	}
+}
+
+func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, *framework.Error) {
+	var req *http.Request
+
 	// SCAFFOLDING:
-	// Modify the implementation of this method to perform a query to your
-	// real datasource. This example implementation query an in-memory
-	// example datasource that returns JSON objects.
+	// Populate the request with the appropriate path, headers, and query parameters to query the
+	// datasource.
+	url := fmt.Sprintf("https://%s/api/%s", request.BaseURL, request.EntityExternalID)
 
-	exampleRequest := &example_datasource.Request{
-		URL:      fmt.Sprintf("%s/%s/%s", request.Address, request.Config.DatasourceVersion, request.Entity.ExternalId),
-		Username: request.Auth.Basic.Username,
-		Password: request.Auth.Basic.Password,
-		PageSize: request.PageSize,
-		Cursor:   request.Cursor,
-	}
+	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
-	a.Logger.Printf("Querying example datasource at URL %s", exampleRequest.URL)
-
-	exampleResponse, err := a.ExampleClient.GetPage(ctx, exampleRequest)
-
+	res, err := d.Client.Do(req)
 	if err != nil {
-		a.Logger.Printf("Example datasource query failed: %v", err)
-
-		return framework.NewGetPageResponseError(
-			&framework.Error{
-				Message: fmt.Sprintf(ErrMsgExampleDatasourceErrorFmt, err),
-				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_DATASOURCE_FAILED,
-			},
-		)
+		return nil, &framework.Error{
+			Message: fmt.Sprintf("Failed to send request to datasource"),
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
 	}
 
-	adapterErr := web.HTTPError(exampleResponse.StatusCode, exampleResponse.RetryAfterHeader)
-	if adapterErr != nil {
-		a.Logger.Printf("Example datasource query returned failure status code %d", exampleResponse.StatusCode)
+	defer res.Body.Close()
 
-		return framework.NewGetPageResponseError(adapterErr)
+	body, _ := io.ReadAll(res.Body)
+
+	response := &Response{
+		StatusCode:       res.StatusCode,
+		RetryAfterHeader: res.Header.Get("Retry-After"),
 	}
 
-	page := &framework.Page{
-		NextCursor: exampleResponse.NextCursor,
+	if res.StatusCode != http.StatusOK {
+		return response, nil
 	}
 
-	page.Objects, err = web.ConvertJSONObjectList(&request.Entity, exampleResponse.Objects)
-	if err != nil {
-		a.Logger.Printf("Failed to parse JSON objects returned by the datasource: %v", err)
+	objects, nextCursor, _ := ParseResponse(body, request.EntityExternalID, request.PageSize)
 
-		return framework.NewGetPageResponseError(
-			&framework.Error{
-				Message: fmt.Sprintf(ErrMsgExampleDatasourceInvalidAttributeTypeFmt, err.Error()),
-				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ATTRIBUTE_TYPE,
-			},
-		)
+	response.Objects = objects
+	response.NextCursor = nextCursor
+
+	return response, nil
+}
+
+func ParseResponse(
+	body []byte, entityExternalID string, pageSize int64,
+) (objects []map[string]any, nextCursor string, err *framework.Error) {
+	var data map[string]any
+
+	unmarshalErr := json.Unmarshal(body, &data)
+	if unmarshalErr != nil {
+		return nil, "", &framework.Error{
+			Message: fmt.Sprintf("Failed to unmarshal the example datasource response: %v.", unmarshalErr),
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
 	}
 
-	return framework.NewGetPageResponseSuccess(page)
+	// SCAFFOLDING:
+	// Replace `response` with the field name in the example datasource response that contains the
+	// list of objects.
+	rawData, found := data["response"]
+	if !found {
+		return nil, "", &framework.Error{
+			Message: fmt.Sprintf("Field missing in the example datasource response: %s.", "response"),
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
+	}
+
+	rawObjects, ok := rawData.([]any)
+	if !ok {
+		return nil, "", &framework.Error{
+			Message: fmt.Sprintf(
+				"Entity %s field exists in the example datasource response but field value is not a list of objects: %T.",
+				entityExternalID,
+				rawData,
+			),
+			Code: api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
+	}
+
+	parsedObjects, parserErr := parseObjects(rawObjects)
+	if parserErr != nil {
+		return nil, "", parserErr
+	}
+
+	// SCAFFOLDING:
+	// Populate nextCursor with the cursor returned from the datasource, if present.
+	nextCursor = ""
+
+	return parsedObjects, nextCursor, nil
+}
+
+// parseObjects parses []any into []map[string]any. If any object in the slice is not a map[string]any,
+// a framework.Error is returned.
+func parseObjects(objects []any) ([]map[string]any, *framework.Error) {
+	parsedObjects := make([]map[string]any, 0, len(objects))
+
+	for _, object := range objects {
+		parsedObject, ok := object.(map[string]any)
+		if !ok {
+			return nil, &framework.Error{
+				Message: fmt.Sprintf("An object could not be parsed into map[string]any: %v.", object),
+				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+			}
+		}
+
+		parsedObjects = append(parsedObjects, parsedObject)
+	}
+
+	return parsedObjects, nil
 }
