@@ -90,7 +90,7 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	// SCAFFOLDING:
 	// Populate the request with the appropriate path, headers, and query parameters to query the
 	// datasource.
-	url := fmt.Sprintf("https://%s/api/%s", request.BaseURL, request.EntityExternalID)
+	url := fmt.Sprintf("%s/api/%s", request.BaseURL, request.EntityExternalID)
 
 	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 
