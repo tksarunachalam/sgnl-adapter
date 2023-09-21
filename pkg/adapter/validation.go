@@ -39,27 +39,6 @@ const (
 	// SCAFFOLDING:
 	// Update this limit to match the limit of the datasource.
 	MaxPageSize = 100
-
-	// UniqueIdAttribute is the name of the attribute containing the unique ID of
-	// each returned object for the requested entity.
-	//
-	// SCAFFOLDING:
-	// Update this to match the name of the unique ID attribute in the
-	// requested entity.
-	UniqueIdAttribute = "id"
-)
-
-var (
-	// ValidEntityExternalIds is the set of valid external IDs of entities that
-	// can be queried.
-	//
-	// SCAFFOLDING:
-	// Update this set to match the set of entities that can be queried from
-	// the datasource.
-	ValidEntityExternalIds = map[string]struct{}{
-		"User":  {},
-		"Group": {},
-	}
 )
 
 // ValidateGetPageRequest validates the fields of the GetPage Request.
@@ -91,7 +70,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 		}
 	}
 
-	if _, found := ValidEntityExternalIds[request.Entity.ExternalId]; !found {
+	if _, found := ValidEntityExternalIDs[request.Entity.ExternalId]; !found {
 		return &framework.Error{
 			Message: ErrMsgInvalidEntityExternalId,
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,
@@ -102,7 +81,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 	// is requested.
 	var uniqueIdAttributeFound bool
 	for _, attribute := range request.Entity.Attributes {
-		if attribute.ExternalId == UniqueIdAttribute {
+		if attribute.ExternalId == ValidEntityExternalIDs[request.Entity.ExternalId].uniqueIDAttrExternalID {
 			uniqueIdAttributeFound = true
 			break
 		}

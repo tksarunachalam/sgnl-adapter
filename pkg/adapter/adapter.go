@@ -16,10 +16,13 @@ package adapter
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"strings"
+	"time"
 
 	framework "github.com/sgnl-ai/adapter-framework"
-	"github.com/sgnl-ai/adapter-template/pkg/example_datasource"
+	api_adapter_v1 "github.com/sgnl-ai/adapter-framework/api/adapter/v1"
+	"github.com/sgnl-ai/adapter-framework/web"
 )
 
 // Adapter implements the framework.Adapter interface to query pages of objects
@@ -28,32 +31,107 @@ type Adapter struct {
 	// SCAFFOLDING:
 	// Add/remove fields below as needed to configure this adapter.
 
-	// Logger is a standard logger.
-	Logger *log.Logger
-
-	// ExampleClient provides access to the example datasource.
-	ExampleClient example_datasource.Client
+	// Client provides access to the datasource.
+	Client Client
 }
 
 // NewAdapter instantiates a new Adapter.
 //
 // SCAFFOLDING:
 // Add/remove parameters as needed to configure this adapter.
-func NewAdapter(logger *log.Logger, client example_datasource.Client) framework.Adapter[Config] {
+func NewAdapter(client Client) framework.Adapter[Config] {
 	return &Adapter{
-		Logger:        logger,
-		ExampleClient: client,
+		Client: client,
 	}
 }
 
 // GetPage is called by SGNL's ingestion service to query a page of objects
 // from a datasource.
 func (a *Adapter) GetPage(ctx context.Context, request *framework.Request[Config]) framework.Response {
-	a.Logger.Printf("Received GetPage call")
-
 	if err := a.ValidateGetPageRequest(ctx, request); err != nil {
 		return framework.NewGetPageResponseError(err)
 	}
 
 	return a.RequestPageFromDatasource(ctx, request)
+}
+
+// RequestPageFromDatasource requests a page of objects from a datasource.
+func (a *Adapter) RequestPageFromDatasource(
+	ctx context.Context, request *framework.Request[Config],
+) framework.Response {
+	// SCAFFOLDING:
+	// Modify the implementation of this method to perform a query to your
+	// real datasource.
+
+	if !strings.HasPrefix(request.Address, "https://") {
+		request.Address = "https://" + request.Address
+	}
+
+	req := &Request{
+		BaseURL:          request.Address,
+		Username:         request.Auth.Basic.Username,
+		Password:         request.Auth.Basic.Password,
+		PageSize:         request.PageSize,
+		EntityExternalID: request.Entity.ExternalId,
+		Cursor:           request.Cursor,
+	}
+
+	resp, err := a.Client.GetPage(ctx, req)
+	if err != nil {
+		return framework.NewGetPageResponseError(err)
+	}
+
+	// An adapter error message is generated if the response status code is not
+	// successful (i.e. if not statusCode >= 200 && statusCode < 300).
+	if adapterErr := web.HTTPError(resp.StatusCode, resp.RetryAfterHeader); adapterErr != nil {
+		return framework.NewGetPageResponseError(err)
+	}
+
+	// The raw JSON objects from the response must be parsed and converted into framework.Objects.
+	// Nested attributes are flattened and delimited by the delimiter specified.
+	// DateTime values are parsed using the specified DateTimeFormatWithTimeZone.
+	parsedObjects, parserErr := web.ConvertJSONObjectList(
+		&request.Entity,
+		resp.Objects,
+
+		// SCAFFOLDING:
+		// Disable JSONPathAttributeNames if your datasource does not support
+		// JSONPath attribute names. This should be enabled for most datasources.
+		web.WithJSONPathAttributeNames(),
+
+		// SCAFFOLDING:
+		// Provide a list of datetime formats supported by your datasource if
+		// they are known. This will optimize the parsing of datetime values.
+		// If this is not known, you can omit this option which will try
+		// a list of common datetime formats.
+		web.WithDateTimeFormats(
+			[]web.DateTimeFormatWithTimeZone{
+				{Format: time.RFC3339, HasTimeZone: true},
+				{Format: time.RFC3339Nano, HasTimeZone: true},
+				{Format: "2006-01-02T15:04:05.000Z0700", HasTimeZone: true},
+				{Format: "2006-01-02", HasTimeZone: false},
+			}...,
+		),
+
+		// SCAFFOLDING:
+		// This can be provided to be used as a default value when parsing
+		// datetime values lacking timezone info. This defaults to UTC.
+		// web.WithLocalTimeZoneOffset(-7),
+	)
+	if parserErr != nil {
+		return framework.NewGetPageResponseError(
+			&framework.Error{
+				Message: fmt.Sprintf("Failed to convert datasource response objects: %v.", parserErr),
+				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+			},
+		)
+	}
+
+	page := &framework.Page{
+		Objects: parsedObjects,
+	}
+
+	page.NextCursor = resp.NextCursor
+
+	return framework.NewGetPageResponseSuccess(page)
 }
