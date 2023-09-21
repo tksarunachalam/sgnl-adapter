@@ -17,7 +17,6 @@ package adapter
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -32,9 +31,6 @@ type Adapter struct {
 	// SCAFFOLDING:
 	// Add/remove fields below as needed to configure this adapter.
 
-	// Logger is a standard logger.
-	Logger *log.Logger
-
 	// ExampleClient provides access to the example datasource.
 	ExampleClient Client
 }
@@ -43,9 +39,8 @@ type Adapter struct {
 //
 // SCAFFOLDING:
 // Add/remove parameters as needed to configure this adapter.
-func NewAdapter(logger *log.Logger, client Client) framework.Adapter[Config] {
+func NewAdapter(client Client) framework.Adapter[Config] {
 	return &Adapter{
-		Logger:        logger,
 		ExampleClient: client,
 	}
 }
@@ -53,8 +48,6 @@ func NewAdapter(logger *log.Logger, client Client) framework.Adapter[Config] {
 // GetPage is called by SGNL's ingestion service to query a page of objects
 // from a datasource.
 func (a *Adapter) GetPage(ctx context.Context, request *framework.Request[Config]) framework.Response {
-	a.Logger.Printf("Received GetPage call")
-
 	if err := a.ValidateGetPageRequest(ctx, request); err != nil {
 		return framework.NewGetPageResponseError(err)
 	}
@@ -85,16 +78,12 @@ func (a *Adapter) RequestPageFromDatasource(
 
 	resp, err := a.ExampleClient.GetPage(ctx, req)
 	if err != nil {
-		a.Logger.Printf("Example datasource query failed: %v", err)
-
 		return framework.NewGetPageResponseError(err)
 	}
 
 	// An adapter error message is generated if the response status code is not
 	// successful (i.e. if not statusCode >= 200 && statusCode < 300).
 	if adapterErr := web.HTTPError(resp.StatusCode, resp.RetryAfterHeader); adapterErr != nil {
-		a.Logger.Printf("Example datasource query returned failure status code %d", resp.StatusCode)
-
 		return framework.NewGetPageResponseError(err)
 	}
 

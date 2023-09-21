@@ -46,7 +46,7 @@ func main() {
 	// Pass options to configure TLS, etc.
 	s := grpc.NewServer()
 
-	adapter := adapter.NewAdapter(logger, adapter.NewClient(10))
+	adapter := adapter.NewAdapter(adapter.NewClient(10))
 
 	api_adapter_v1.RegisterAdapterServer(s, server.New(adapter))
 
