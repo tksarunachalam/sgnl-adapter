@@ -31,8 +31,8 @@ type Adapter struct {
 	// SCAFFOLDING:
 	// Add/remove fields below as needed to configure this adapter.
 
-	// ExampleClient provides access to the example datasource.
-	ExampleClient Client
+	// Client provides access to the datasource.
+	Client Client
 }
 
 // NewAdapter instantiates a new Adapter.
@@ -41,7 +41,7 @@ type Adapter struct {
 // Add/remove parameters as needed to configure this adapter.
 func NewAdapter(client Client) framework.Adapter[Config] {
 	return &Adapter{
-		ExampleClient: client,
+		Client: client,
 	}
 }
 
@@ -76,7 +76,7 @@ func (a *Adapter) RequestPageFromDatasource(
 		Cursor:           request.Cursor,
 	}
 
-	resp, err := a.ExampleClient.GetPage(ctx, req)
+	resp, err := a.Client.GetPage(ctx, req)
 	if err != nil {
 		return framework.NewGetPageResponseError(err)
 	}
@@ -121,7 +121,7 @@ func (a *Adapter) RequestPageFromDatasource(
 	if parserErr != nil {
 		return framework.NewGetPageResponseError(
 			&framework.Error{
-				Message: fmt.Sprintf("Failed to convert example datasource response objects: %v.", parserErr),
+				Message: fmt.Sprintf("Failed to convert datasource response objects: %v.", parserErr),
 				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 			},
 		)

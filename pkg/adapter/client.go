@@ -20,7 +20,7 @@ import (
 	framework "github.com/sgnl-ai/adapter-framework"
 )
 
-// Client is a client that allows querying the example datasource which
+// Client is a client that allows querying the datasource which
 // contains JSON objects.
 type Client interface {
 	// GetPage returns a page of JSON objects from the datasource for the
@@ -33,17 +33,15 @@ type Client interface {
 // SCAFFOLDING:
 // Add/remove fields as needed.
 
-// Request is a request to the example datasource.
+// Request is a request to the datasource.
 type Request struct {
 	// BaseURL is the Base URL of the datasource to query.
 	BaseURL string
 
-	// Username is the username to use to authenticate with the example
-	// datasource.
+	// Username is the username to use to authenticate with the datasource.
 	Username string
 
-	// Password is the password to use to authenticate with the example
-	// datasource.
+	// Password is the password to use to authenticate with the datasource.
 	Password string
 
 	// PageSize is the maximum number of objects to return from the entity.
@@ -59,7 +57,7 @@ type Request struct {
 	Cursor string
 }
 
-// Response is a response returned by the example datasource.
+// Response is a response returned by the datasource.
 type Response struct {
 	// StatusCode is an HTTP status code.
 	StatusCode int

@@ -64,8 +64,8 @@ var (
 // SCAFFOLDING:
 // Update the set of error messages.
 const (
-	ErrMsgExampleDatasourceErrorFmt      = "Example datasource returned an error: %v"
-	ErrMsgExampleDatasourceStatusCodeFmt = "Example datasource returned unexpected status code: %d"
+	ErrMsgDatasourceErrorFmt      = "Datasource returned an error: %v"
+	ErrMsgDatasourceStatusCodeFmt = "Datasource returned unexpected status code: %d"
 )
 
 // Datasource directly implements a Client interface to allow querying
@@ -74,7 +74,7 @@ type Datasource struct {
 	Client *http.Client
 }
 
-// NewClient returns a Client to query the example datasource.
+// NewClient returns a Client to query the datasource.
 func NewClient(timeout int) Client {
 	return &Datasource{
 		Client: &http.Client{
@@ -130,18 +130,18 @@ func ParseResponse(
 	unmarshalErr := json.Unmarshal(body, &data)
 	if unmarshalErr != nil {
 		return nil, "", &framework.Error{
-			Message: fmt.Sprintf("Failed to unmarshal the example datasource response: %v.", unmarshalErr),
+			Message: fmt.Sprintf("Failed to unmarshal the datasource response: %v.", unmarshalErr),
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 		}
 	}
 
 	// SCAFFOLDING:
-	// Replace `response` with the field name in the example datasource response that contains the
+	// Replace `response` with the field name in the datasource response that contains the
 	// list of objects.
 	rawData, found := data["response"]
 	if !found {
 		return nil, "", &framework.Error{
-			Message: fmt.Sprintf("Field missing in the example datasource response: %s.", "response"),
+			Message: fmt.Sprintf("Field missing in the datasource response: %s.", "response"),
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 		}
 	}
@@ -150,7 +150,7 @@ func ParseResponse(
 	if !ok {
 		return nil, "", &framework.Error{
 			Message: fmt.Sprintf(
-				"Entity %s field exists in the example datasource response but field value is not a list of objects: %T.",
+				"Entity %s field exists in the datasource response but field value is not a list of objects: %T.",
 				entityExternalID,
 				rawData,
 			),

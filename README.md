@@ -12,7 +12,6 @@
    ```
 
 1. Modify the adapter implementation in package `pkg/adapter` to query your datasource. All the code that must be modified is identified with `SCAFFOLDING` comments.
-1. Delete the example datasource implementation in package `pkg/example_datasource`.
 1. Build the Docker image with the `adapter` command.
    ```
    docker build -t adapter:latest .
