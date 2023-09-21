@@ -15,6 +15,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -26,18 +27,18 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
+var (
 	// Port is the port at which the gRPC server will listen.
-	//
-	// SCAFFOLDING:
-	// Modify this port as needed, or make it configurable.
-	ServerPort = 8080
+	Port = flag.Int("port", 8080, "The server port")
+
+	// Timeout is the timeout for the HTTP client used to make requests to the datasource (seconds).
+	Timeout = flag.Int("timeout", 30, "The timeout for the HTTP client used to make requests to the datasource (seconds)")
 )
 
 func main() {
 	logger := log.New(os.Stdout, "adapter", log.Lmicroseconds|log.LUTC|log.Lshortfile)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", ServerPort))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", Port))
 	if err != nil {
 		logger.Fatalf("Failed to open server port: %v", err)
 	}
@@ -46,11 +47,11 @@ func main() {
 	// Pass options to configure TLS, etc.
 	s := grpc.NewServer()
 
-	adapter := adapter.NewAdapter(adapter.NewClient(10))
+	adapter := adapter.NewAdapter(adapter.NewClient(*Timeout))
 
 	api_adapter_v1.RegisterAdapterServer(s, server.New(adapter))
 
-	logger.Printf("Started adapter gRPC server on port %d", ServerPort)
+	logger.Printf("Started adapter gRPC server on port %d", Port)
 
 	if err := s.Serve(listener); err != nil {
 		logger.Fatalf("Failed to listen on server port: %v", err)

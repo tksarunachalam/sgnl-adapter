@@ -64,9 +64,8 @@ var (
 // SCAFFOLDING:
 // Update the set of error messages.
 const (
-	ErrMsgExampleDatasourceErrorFmt                = "Example datasource returned an error: %v"
-	ErrMsgExampleDatasourceStatusCodeFmt           = "Example datasource returned unexpected status code: %d"
-	ErrMsgExampleDatasourceInvalidAttributeTypeFmt = "Example datasource returned an attribute with an incompatible type: %s"
+	ErrMsgExampleDatasourceErrorFmt      = "Example datasource returned an error: %v"
+	ErrMsgExampleDatasourceStatusCodeFmt = "Example datasource returned unexpected status code: %d"
 )
 
 // Datasource directly implements a Client interface to allow querying
@@ -97,7 +96,7 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	res, err := d.Client.Do(req)
 	if err != nil {
 		return nil, &framework.Error{
-			Message: fmt.Sprintf("Failed to send request to datasource"),
+			Message: "Failed to send request to datasource",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 		}
 	}
