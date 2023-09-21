@@ -51,7 +51,7 @@ func main() {
 
 	api_adapter_v1.RegisterAdapterServer(s, server.New(adapter))
 
-	logger.Printf("Started adapter gRPC server on port %d", Port)
+	logger.Printf("Started adapter gRPC server on port %d", *Port)
 
 	if err := s.Serve(listener); err != nil {
 		logger.Fatalf("Failed to listen on server port: %v", err)
