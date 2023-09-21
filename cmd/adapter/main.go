@@ -38,7 +38,7 @@ var (
 func main() {
 	logger := log.New(os.Stdout, "adapter", log.Lmicroseconds|log.LUTC|log.Lshortfile)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", Port))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *Port))
 	if err != nil {
 		logger.Fatalf("Failed to open server port: %v", err)
 	}
