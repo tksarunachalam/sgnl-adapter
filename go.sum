@@ -8,8 +8,10 @@ github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
-github.com/sgnl-ai/adapter-framework v0.5.0 h1:V6nsTjcHfADR5BMZxfs1pTktr4RHx28K4qfL0JkO5mI=
-github.com/sgnl-ai/adapter-framework v0.5.0/go.mod h1:NGiNp7TM9IL3wZ7g5kvD3YuuWc7rPXbY2R4llptPcg4=
+github.com/sgnl-ai/adapter-framework v0.6.0 h1:boBeOtsTuvVzOO1fOX77RKAWQOX7qA2PsC+IQ/dXAhY=
+github.com/sgnl-ai/adapter-framework v0.6.0/go.mod h1:ATWOvtyUP5qJAgPxF4L64r1unBo9enx4UVZ839M8Gys=
+github.com/sosodev/duration v1.1.0 h1:kQcaiGbJaIsRqgQy7VGlZrVw1giWO+lDoX3MCPnpVO4=
+github.com/sosodev/duration v1.1.0/go.mod h1:RQIBBX0+fMLc/D9+Jb/fwvVmo0eZvDDEERAikUR6SDg=
 golang.org/x/net v0.11.0 h1:Gi2tvZIJyBtO9SDr1q9h5hEQCp/4L2RQ+ar0qjx2oNU=
 golang.org/x/net v0.11.0/go.mod h1:2L/ixqYpgIVXmeoSA/4Lu7BzTG4KIyPIryS4IsOd1oQ=
 golang.org/x/sys v0.9.0 h1:KS/R3tvhPqvJvwcKfnBHJwwthS11LRhmM5D59eEXa0s=
