@@ -47,9 +47,21 @@ func main() {
 	// Pass options to configure TLS, etc.
 	s := grpc.NewServer()
 
-	adapter := adapter.NewAdapter(adapter.NewClient(*Timeout))
+	stop := make(chan struct{})
 
-	api_adapter_v1.RegisterAdapterServer(s, server.New(adapter))
+	adapterServer := server.New(stop)
+
+	// SCAFFOLDING:
+	// The Adapter type below must be unique across all registered Adapters and match the Adapter
+	// type configured on the Adapter object via the SGNL Config API.
+	//
+	// If you need to run multiple adapters on the same gRPC server, they can be registered here.
+	err = server.RegisterAdapter(adapterServer, "Test-1.0.0", adapter.NewAdapter(adapter.NewClient(*Timeout)))
+	if err != nil {
+		logger.Fatalf("Failed to register adapter: %v", err)
+	}
+
+	api_adapter_v1.RegisterAdapterServer(s, adapterServer)
 
 	logger.Printf("Started adapter gRPC server on port %d", *Port)
 
