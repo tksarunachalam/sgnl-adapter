@@ -84,7 +84,7 @@ func (a *Adapter) RequestPageFromDatasource(
 	// An adapter error message is generated if the response status code is not
 	// successful (i.e. if not statusCode >= 200 && statusCode < 300).
 	if adapterErr := web.HTTPError(resp.StatusCode, resp.RetryAfterHeader); adapterErr != nil {
-		return framework.NewGetPageResponseError(err)
+		return framework.NewGetPageResponseError(adapterErr)
 	}
 
 	// The raw JSON objects from the response must be parsed and converted into framework.Objects.
