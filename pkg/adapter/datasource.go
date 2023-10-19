@@ -45,6 +45,22 @@ type Entity struct {
 	uniqueIDAttrExternalID string
 }
 
+// Datasource directly implements a Client interface to allow querying
+// an external datasource.
+type Datasource struct {
+	Client *http.Client
+}
+
+type DatasourceResponse struct {
+	// SCAFFOLDING:
+	// Add or remove fields as needed. This should be used to unmarshal the response from the datasource.
+
+	// SCAFFOLDING:
+	// Replace `objects` with the field name in the datasource response that contains the
+	// list of objects. Update the datatype is needed.
+	Objects []map[string]any `json:"objects,omitempty"`
+}
+
 var (
 	// SCAFFOLDING:
 	// Using the consts defined above, update the set of valid entity types supported by this adapter.
@@ -60,12 +76,6 @@ var (
 		},
 	}
 )
-
-// Datasource directly implements a Client interface to allow querying
-// an external datasource.
-type Datasource struct {
-	Client *http.Client
-}
 
 // NewClient returns a Client to query the datasource.
 func NewClient(timeout int) Client {
@@ -84,7 +94,24 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	// datasource.
 	url := fmt.Sprintf("%s/api/%s", request.BaseURL, request.EntityExternalID)
 
-	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, &framework.Error{
+			Message: "Failed to create HTTP request to datasource.",
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
+	}
+
+	// Timeout API calls that take longer than 5 seconds
+	apiCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	req = req.WithContext(apiCtx)
+
+	// SCAFFOLDING:
+	// Add headers to the request, if any.
+	// req.Header.Add("Accept", "application/json")
+	// req.Header.Add("Authorization", "Bearer Token")
 
 	res, err := d.Client.Do(req)
 	if err != nil {
@@ -93,10 +120,6 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 		}
 	}
-
-	defer res.Body.Close()
-
-	body, _ := io.ReadAll(res.Body)
 
 	response := &Response{
 		StatusCode:       res.StatusCode,
@@ -107,7 +130,20 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 		return response, nil
 	}
 
-	objects, nextCursor, _ := ParseResponse(body, request.EntityExternalID, request.PageSize)
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, &framework.Error{
+			Message: "Failed to read response body.",
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_DATASOURCE_FAILED,
+		}
+	}
+
+	objects, nextCursor, parseErr := ParseResponse(body)
+	if parseErr != nil {
+		return nil, parseErr
+	}
 
 	response.Objects = objects
 	response.NextCursor = nextCursor
@@ -115,10 +151,8 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	return response, nil
 }
 
-func ParseResponse(
-	body []byte, entityExternalID string, pageSize int64,
-) (objects []map[string]any, nextCursor string, err *framework.Error) {
-	var data map[string]any
+func ParseResponse(body []byte) (objects []map[string]any, nextCursor string, err *framework.Error) {
+	var data *DatasourceResponse
 
 	unmarshalErr := json.Unmarshal(body, &data)
 	if unmarshalErr != nil {
@@ -129,56 +163,11 @@ func ParseResponse(
 	}
 
 	// SCAFFOLDING:
-	// Replace `response` with the field name in the datasource response that contains the
-	// list of objects.
-	rawData, found := data["response"]
-	if !found {
-		return nil, "", &framework.Error{
-			Message: "Field missing in the datasource response: response.",
-			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
-		}
-	}
-
-	rawObjects, ok := rawData.([]any)
-	if !ok {
-		return nil, "", &framework.Error{
-			Message: fmt.Sprintf(
-				"Entity %s field exists in the datasource response but field value is not a list of objects: %T.",
-				entityExternalID,
-				rawData,
-			),
-			Code: api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
-		}
-	}
-
-	parsedObjects, parserErr := parseObjects(rawObjects)
-	if parserErr != nil {
-		return nil, "", parserErr
-	}
+	// Add necessary validations to check if the response from the datasource is what is expected.
 
 	// SCAFFOLDING:
 	// Populate nextCursor with the cursor returned from the datasource, if present.
 	nextCursor = ""
 
-	return parsedObjects, nextCursor, nil
-}
-
-// parseObjects parses []any into []map[string]any. If any object in the slice is not a map[string]any,
-// a framework.Error is returned.
-func parseObjects(objects []any) ([]map[string]any, *framework.Error) {
-	parsedObjects := make([]map[string]any, 0, len(objects))
-
-	for _, object := range objects {
-		parsedObject, ok := object.(map[string]any)
-		if !ok {
-			return nil, &framework.Error{
-				Message: fmt.Sprintf("An object could not be parsed into map[string]any: %v.", object),
-				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
-			}
-		}
-
-		parsedObjects = append(parsedObjects, parsedObject)
-	}
-
-	return parsedObjects, nil
+	return data.Objects, nextCursor, nil
 }

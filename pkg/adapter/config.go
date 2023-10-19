@@ -19,11 +19,6 @@ import (
 	"errors"
 )
 
-var (
-	ErrConfigIsNil                    = errors.New("request contains no config")
-	ErrConfigDatasourceVersionIsEmpty = errors.New("config datasourceVersion is not set")
-)
-
 // Config is the optional configuration passed in each GetPage calls to the
 // adapter.
 type Config struct {
@@ -39,12 +34,11 @@ type Config struct {
 func (c *Config) Validate(_ context.Context) error {
 	// SCAFFOLDING:
 	// Update the checks below to validate the fields in Config.
-
 	switch {
 	case c == nil:
-		return ErrConfigIsNil
+		return errors.New("request contains no config")
 	case c.DatasourceVersion == "":
-		return ErrConfigDatasourceVersionIsEmpty
+		return errors.New("config datasourceVersion is not set")
 	default:
 		return nil
 	}
