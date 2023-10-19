@@ -98,8 +98,9 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 
 	req = req.WithContext(apiCtx)
 
+	// SCAFFOLDING:
 	// Add headers to the request, if any.
-	// req.Header.Add("Content-Type", "application/json")
+	// req.Header.Add("Accept", "application/json")
 	// req.Header.Add("Authorization", "Bearer Token")
 
 	res, err := d.Client.Do(req)
@@ -190,7 +191,7 @@ func ParseResponse(
 
 // parseObjects parses []any into []map[string]any. If any object in the slice is not a map[string]any,
 // a framework.Error is returned.
-func parseObjects(objects []any, entityExternalId string) ([]map[string]any, *framework.Error) {
+func parseObjects(objects []any, entityExternalID string) ([]map[string]any, *framework.Error) {
 	parsedObjects := make([]map[string]any, 0, len(objects))
 
 	for _, object := range objects {
@@ -199,7 +200,7 @@ func parseObjects(objects []any, entityExternalId string) ([]map[string]any, *fr
 			return nil, &framework.Error{
 				Message: fmt.Sprintf(
 					"An object in Entity: %s could not be parsed. Expected: map[string]any. Got: %T.",
-					entityExternalId,
+					entityExternalID,
 					object,
 				),
 				Code: api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
