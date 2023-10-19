@@ -140,7 +140,7 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 		}
 	}
 
-	objects, nextCursor, parseErr := ParseResponse(body, request.EntityExternalID, request.PageSize)
+	objects, nextCursor, parseErr := ParseResponse(body)
 	if parseErr != nil {
 		return nil, parseErr
 	}
@@ -151,9 +151,7 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	return response, nil
 }
 
-func ParseResponse(
-	body []byte, entityExternalID string, pageSize int64,
-) (objects []map[string]any, nextCursor string, err *framework.Error) {
+func ParseResponse(body []byte) (objects []map[string]any, nextCursor string, err *framework.Error) {
 	var data *DatasourceResponse
 
 	unmarshalErr := json.Unmarshal(body, &data)

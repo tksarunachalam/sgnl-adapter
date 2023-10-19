@@ -34,7 +34,6 @@ type Config struct {
 func (c *Config) Validate(_ context.Context) error {
 	// SCAFFOLDING:
 	// Update the checks below to validate the fields in Config.
-
 	switch {
 	case c == nil:
 		return errors.New("request contains no config")

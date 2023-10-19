@@ -69,15 +69,17 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 
 	// Validate that at least the unique ID attribute for the requested entity
 	// is requested.
-	var uniqueIdAttributeFound bool
+	var uniqueIDAttributeFound bool
+
 	for _, attribute := range request.Entity.Attributes {
 		if attribute.ExternalId == ValidEntityExternalIDs[request.Entity.ExternalId].uniqueIDAttrExternalID {
-			uniqueIdAttributeFound = true
+			uniqueIDAttributeFound = true
+
 			break
 		}
 	}
 
-	if !uniqueIdAttributeFound {
+	if !uniqueIDAttributeFound {
 		return &framework.Error{
 			Message: "Requested entity attributes are missing unique ID attribute.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,

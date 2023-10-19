@@ -62,7 +62,6 @@ func (a *Adapter) RequestPageFromDatasource(
 	// SCAFFOLDING:
 	// Modify the implementation of this method to perform a query to your
 	// real datasource.
-
 	if !strings.HasPrefix(request.Address, "https://") {
 		request.Address = "https://" + request.Address
 	}
