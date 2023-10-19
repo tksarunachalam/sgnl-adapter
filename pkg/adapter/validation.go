@@ -35,7 +35,7 @@ const (
 func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework.Request[Config]) *framework.Error {
 	if err := request.Config.Validate(ctx); err != nil {
 		return &framework.Error{
-			Message: err.Error(),
+			Message: fmt.Sprintf("Provided config is invalid: %v.", err.Error()),
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_DATASOURCE_CONFIG,
 		}
 	}
@@ -45,7 +45,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 	// address.
 	if !strings.HasPrefix(request.Address, "https://") {
 		return &framework.Error{
-			Message: "Provided datasource address is not an https:// URL",
+			Message: "Provided datasource address is not an https:// URL.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_DATASOURCE_CONFIG,
 		}
 	}
@@ -55,14 +55,14 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 	// datasource.
 	if request.Auth == nil || request.Auth.Basic == nil {
 		return &framework.Error{
-			Message: "Provided datasource auth is missing required basic credentials",
+			Message: "Provided datasource auth is missing required basic credentials.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_DATASOURCE_CONFIG,
 		}
 	}
 
 	if _, found := ValidEntityExternalIDs[request.Entity.ExternalId]; !found {
 		return &framework.Error{
-			Message: "Provided entity external ID is invalid",
+			Message: "Provided entity external ID is invalid.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,
 		}
 	}
@@ -79,7 +79,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 
 	if !uniqueIdAttributeFound {
 		return &framework.Error{
-			Message: "Requested entity attributes are missing unique ID attribute",
+			Message: "Requested entity attributes are missing unique ID attribute.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,
 		}
 	}
@@ -90,7 +90,7 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 	// Modify this validation if the entity contains child entities.
 	if len(request.Entity.ChildEntities) > 0 {
 		return &framework.Error{
-			Message: "Requested entity does not support child entities",
+			Message: "Requested entity does not support child entities.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,
 		}
 	}
@@ -101,14 +101,14 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 	// false.
 	if !request.Ordered {
 		return &framework.Error{
-			Message: "Ordered must be set to true",
+			Message: "Ordered must be set to true.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_ENTITY_CONFIG,
 		}
 	}
 
 	if request.PageSize > MaxPageSize {
 		return &framework.Error{
-			Message: fmt.Sprintf("Provided page size (%d) exceeds maximum (%d)", request.PageSize, MaxPageSize),
+			Message: fmt.Sprintf("Provided page size (%d) exceeds maximum (%d).", request.PageSize, MaxPageSize),
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_PAGE_REQUEST_CONFIG,
 		}
 	}
