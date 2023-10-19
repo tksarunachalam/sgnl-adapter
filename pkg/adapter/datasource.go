@@ -84,7 +84,23 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 	// datasource.
 	url := fmt.Sprintf("%s/api/%s", request.BaseURL, request.EntityExternalID)
 
-	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, &framework.Error{
+			Message: "Failed to create HTTP request to datasource.",
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+		}
+	}
+
+	// Timeout API calls that take longer than 5 seconds
+	apiCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	req = req.WithContext(apiCtx)
+
+	// Add headers to the request, if any.
+	// req.Header.Add("Content-Type", "application/json")
+	// req.Header.Add("Authorization", "Bearer Token")
 
 	res, err := d.Client.Do(req)
 	if err != nil {
@@ -93,10 +109,6 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 		}
 	}
-
-	defer res.Body.Close()
-
-	body, _ := io.ReadAll(res.Body)
 
 	response := &Response{
 		StatusCode:       res.StatusCode,
@@ -107,7 +119,20 @@ func (d *Datasource) GetPage(ctx context.Context, request *Request) (*Response, 
 		return response, nil
 	}
 
-	objects, nextCursor, _ := ParseResponse(body, request.EntityExternalID, request.PageSize)
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, &framework.Error{
+			Message: "Failed to read response body.",
+			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_DATASOURCE_FAILED,
+		}
+	}
+
+	objects, nextCursor, parseErr := ParseResponse(body, request.EntityExternalID, request.PageSize)
+	if parseErr != nil {
+		return nil, parseErr
+	}
 
 	response.Objects = objects
 	response.NextCursor = nextCursor
@@ -151,7 +176,7 @@ func ParseResponse(
 		}
 	}
 
-	parsedObjects, parserErr := parseObjects(rawObjects)
+	parsedObjects, parserErr := parseObjects(rawObjects, entityExternalID)
 	if parserErr != nil {
 		return nil, "", parserErr
 	}
@@ -165,15 +190,19 @@ func ParseResponse(
 
 // parseObjects parses []any into []map[string]any. If any object in the slice is not a map[string]any,
 // a framework.Error is returned.
-func parseObjects(objects []any) ([]map[string]any, *framework.Error) {
+func parseObjects(objects []any, entityExternalId string) ([]map[string]any, *framework.Error) {
 	parsedObjects := make([]map[string]any, 0, len(objects))
 
 	for _, object := range objects {
 		parsedObject, ok := object.(map[string]any)
 		if !ok {
 			return nil, &framework.Error{
-				Message: fmt.Sprintf("An object could not be parsed into map[string]any: %v.", object),
-				Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
+				Message: fmt.Sprintf(
+					"An object in Entity: %s could not be parsed. Expected: map[string]any. Got: %T.",
+					entityExternalId,
+					object,
+				),
+				Code: api_adapter_v1.ErrorCode_ERROR_CODE_INTERNAL,
 			}
 		}
 
