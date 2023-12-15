@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ARG GOLANG_IMAGE=golang:1.18-bullseye
+ARG GOLANG_IMAGE=golang:1.21.3-bookworm
 ARG BASE_IMAGE=gcr.io/distroless/static
 
 FROM ${GOLANG_IMAGE} as build
@@ -35,18 +35,10 @@ RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v${PROTOC_GEN_GO_RP
 ARG GOPS_VERSION=v0.3.27
 RUN CGO_ENABLED=0 go install -ldflags "-s -w" github.com/google/gops@${GOPS_VERSION}
 
+ARG AUTH_TOKENS_PATH=$AUTH_TOKENS_PATH 
+
 WORKDIR /build
 COPY . ./
-
-# TODO: BEGIN
-# Remove this hack to allow accessing the SGNL-ai/* private repositories.
-# DO NOT PUBLISH images built with this Dockerfile as the image's
-# history will include those credentials.
-ARG GITHUB_USER=$GITHUB_USER
-ARG GITHUB_TOKEN=$GITHUB_TOKEN
-RUN echo "machine github.com\n\tlogin $GITHUB_USER\n\tpassword $GITHUB_TOKEN" >> ~/.netrc \
-    && GOPRIVATE=github.com/sgnl-ai go mod download
-# TODO: END
 
 RUN CGO_ENABLED=0 go build -ldflags "-s -w" ./cmd/adapter
 
@@ -57,5 +49,6 @@ WORKDIR /
 
 COPY --from=build /go/bin/gops /gops
 COPY --from=build /build/adapter /adapter
+COPY --from=build /build/$AUTH_TOKENS_PATH /$AUTH_TOKENS_PATH
 
 ENTRYPOINT [ "/adapter" ]
