@@ -66,9 +66,15 @@ func (a *Adapter) RequestPageFromDatasource(
 		request.Address = "https://" + request.Address
 	}
 	req := &Request{
-		BaseURL:          request.Address,
-		Username:         request.Auth.Basic.Username,
-		Password:         request.Auth.Basic.Password,
+		BaseURL: request.Address,
+
+		// Basic Auth
+		Username: request.Auth.Basic.Username,
+		Password: request.Auth.Basic.Password,
+
+		// API Key or OAuth2 Token
+		Token:            request.Auth.HTTPAuthorization,
+		
 		PageSize:         request.PageSize,
 		EntityExternalID: request.Entity.ExternalId,
 		Cursor:           request.Cursor,
