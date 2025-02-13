@@ -1,9 +1,10 @@
-module github.com/sgnl-ai/adapter-template
+module github.com/tksarunachalam/sgnl-adaptor
 
 go 1.21
 
 require (
 	github.com/sgnl-ai/adapter-framework v0.7.4
+	github.com/sgnl-ai/adapter-template v0.0.0-20240419142752-a1063e711a0e
 	google.golang.org/grpc v1.60.0
 )
 
