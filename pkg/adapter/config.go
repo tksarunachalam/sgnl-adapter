@@ -37,7 +37,9 @@ func (c *Config) Validate(_ context.Context) error {
 	case c == nil:
 		return errors.New("request contains no config")
 	case c.APIVersion == "":
-		return errors.New("apiVersion is not set")
+		//If the APIVersion is not set, set it to "v1"
+		c.APIVersion = "v1"
+		return nil
 	default:
 		return nil
 	}
