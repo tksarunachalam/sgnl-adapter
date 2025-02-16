@@ -57,6 +57,13 @@ type Request struct {
 	// the last request for the entity.
 	// Optional. If not set, return the first page for this entity.
 	Cursor string
+
+	// Total is a boolean when set to True denotes the total number of objects.
+	// Optional. By default, it is set to False.
+	Total bool
+
+	// Query is the query to filter the objects.
+	Query string
 }
 
 // SCAFFOLDING #6 - pkg/adapter/client.go: Add/Remove/Update any fields to model the response from the SoR API.
