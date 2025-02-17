@@ -38,10 +38,9 @@ func (a *Adapter) ValidateGetPageRequest(ctx context.Context, request *framework
 		}
 	}
 
-	// TODO: Add api key check here
 	// SCAFFOLDING #8 - pkg/adapter/validation.go: Modify this validation to match the authn mechanism(s) supported by the SoR.
 	//PagerDuty SoR requires only API token
-	if request.Auth == nil && request.Auth.HTTPAuthorization == "" {
+	if request.Auth != nil && request.Auth.HTTPAuthorization == "" {
 		return &framework.Error{
 			Message: "PagerDuty auth is missing required token.",
 			Code:    api_adapter_v1.ErrorCode_ERROR_CODE_INVALID_DATASOURCE_CONFIG,
