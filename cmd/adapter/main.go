@@ -23,7 +23,7 @@ import (
 
 	api_adapter_v1 "github.com/sgnl-ai/adapter-framework/api/adapter/v1"
 	"github.com/sgnl-ai/adapter-framework/server"
-	"github.com/tksarunachalam/sgnl-adaptor/pkg/adapter"
+	"github.com/tksarunachalam/sgnl-adapter/pkg/adapter"
 	"google.golang.org/grpc"
 )
 

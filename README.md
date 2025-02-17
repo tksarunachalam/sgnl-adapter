@@ -1,6 +1,6 @@
 # SGNL Adapter - PagerDuty
 
-SGNL Adaptor for PagerDuty SoR
+SGNL Adapter for PagerDuty SoR
 
 ## Background Information
 
