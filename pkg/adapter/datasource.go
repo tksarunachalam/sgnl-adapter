@@ -31,9 +31,9 @@ import (
 
 const (
 	// SCAFFOLDING #11 - pkg/adapter/datasource.go: Update the set of valid entity types this adapter supports.
-	Users  string = "users"
-	Groups string = "groups"
-	Teams  string = "teams"
+	Users   string = "users"
+	Vendors string = "vendors"
+	Teams   string = "teams"
 )
 
 // Entity contains entity specific information, such as the entity's unique ID attribute and the
@@ -71,12 +71,12 @@ var (
 	// The map value is the Entity struct which contains the unique ID attribute.
 	ValidEntityExternalIDs = map[string]Entity{
 		Users: {
-			uniqueIDAttrExternalID: "user_id",
+			uniqueIDAttrExternalID: "id",
 			endPoint:               Users,
 		},
-		Groups: {
-			uniqueIDAttrExternalID: "group_id",
-			endPoint:               Groups,
+		Vendors: {
+			uniqueIDAttrExternalID: "id",
+			endPoint:               Vendors,
 		},
 		Teams: {
 			uniqueIDAttrExternalID: "id",

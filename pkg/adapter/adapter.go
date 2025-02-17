@@ -68,13 +68,8 @@ func (a *Adapter) RequestPageFromDatasource(
 	req := &Request{
 		BaseURL: request.Address,
 
-		// Basic Auth
-		Username: request.Auth.Basic.Username,
-		Password: request.Auth.Basic.Password,
-
 		// API Key or OAuth2 Token
 		Token:            request.Auth.HTTPAuthorization,
-		
 		PageSize:         request.PageSize,
 		EntityExternalID: request.Entity.ExternalId,
 		Cursor:           request.Cursor,
@@ -101,7 +96,8 @@ func (a *Adapter) RequestPageFromDatasource(
 		// SCAFFOLDING #23 - pkg/adapter/adapter.go: Disable JSONPathAttributeNames.
 		// Disable JSONPathAttributeNames if your datasource does not support
 		// JSONPath attribute names. This should be enabled for most datasources.
-		web.WithJSONPathAttributeNames(),
+		// PagerDuty does not support JSONPath attribute names. Uncomment the line below if future support is added.
+		//web.WithJSONPathAttributeNames(),
 
 		// SCAFFOLDING #24 - pkg/adapter/adapter.go: List datetime formats supported by your SoR.
 		// Provide a list of datetime formats supported by your datasource if
